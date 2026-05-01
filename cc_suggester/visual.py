@@ -82,7 +82,7 @@ def score_opencv_motion(video_path: Path, events: list[Event], config: VisualCon
         peak = max(diffs, default=0.0)
         score = min(1.0, peak / config.reaction_threshold)
         event.reaction_score = round(score, 3)
-        event.reaction_type = "scene_motion" if score >= 0.4 else None
+        event.reaction_type = "scene_motion" if score >= config.opencv_motion_type_threshold else None
     return events
 
 
@@ -92,34 +92,53 @@ def _landmark_vector(frame: object, pose: object, face_mesh: object) -> list[flo
     import numpy as np
 
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    points: list[tuple[float, float]] = []
-
+    
     image = mp.Image(image_format=mp.ImageFormat.SRGB, data=np.ascontiguousarray(rgb))
 
+    pose_points: list[tuple[float, float]] = []
+    face_points: list[tuple[float, float]] = []
+
+    # Extract pose landmarks (head, shoulders)
     pose_result = pose.detect(image)
     if pose_result.pose_landmarks:
         pose_landmarks = pose_result.pose_landmarks[0]
         for index in (0, 11, 12):
             if index < len(pose_landmarks):
                 landmark = pose_landmarks[index]
-                points.append((landmark.x, landmark.y))
+                pose_points.append((landmark.x, landmark.y))
 
+    # Extract face landmarks (eyes, nose, mouth)
     face_result = face_mesh.detect(image)
     if face_result.face_landmarks:
         face = face_result.face_landmarks[0]
         for index in (1, 13, 14, 33, 263):
             if index < len(face):
                 landmark = face[index]
-                points.append((landmark.x, landmark.y))
+                face_points.append((landmark.x, landmark.y))
 
-    if not points:
+    # Normalize pose and face independently, then combine
+    vectors = []
+    
+    if len(pose_points) > 0:
+        pose_array = np.array(pose_points, dtype=np.float32)
+        pose_centroid = pose_array.mean(axis=0)
+        pose_spread = np.linalg.norm(pose_array - pose_centroid, axis=1).mean() if len(pose_points) > 1 else 1.0
+        pose_spread = max(float(pose_spread), 0.001)
+        pose_normalized = (pose_array - pose_centroid) / pose_spread
+        vectors.extend(pose_normalized.reshape(-1).tolist())
+    
+    if len(face_points) > 0:
+        face_array = np.array(face_points, dtype=np.float32)
+        face_centroid = face_array.mean(axis=0)
+        face_spread = np.linalg.norm(face_array - face_centroid, axis=1).mean() if len(face_points) > 1 else 1.0
+        face_spread = max(float(face_spread), 0.001)
+        face_normalized = (face_array - face_centroid) / face_spread
+        vectors.extend(face_normalized.reshape(-1).tolist())
+    
+    if not vectors:
         return None
-    array = np.array(points, dtype=np.float32)
-    centroid = array.mean(axis=0)
-    spread = np.linalg.norm(array - centroid, axis=1).mean() if len(points) > 1 else 1.0
-    spread = max(float(spread), 0.001)
-    normalised = (array - centroid) / spread
-    return normalised.reshape(-1).tolist()
+    
+    return vectors
 
 
 def _vector_distance(a: list[float], b: list[float]) -> float:

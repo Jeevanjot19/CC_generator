@@ -36,6 +36,70 @@ def _read_wav_mono(path: Path) -> tuple[list[float], int]:
     return samples, sample_rate
 
 
+def _apply_vad_filter(samples: list[float], sample_rate: int, aggressiveness: int = 2) -> list[float]:
+    """Apply Voice Activity Detection to remove speech segments.
+    
+    Args:
+        samples: Audio samples as floats in [-1, 1] range
+        sample_rate: Sample rate in Hz
+        aggressiveness: VAD aggressiveness (0=least, 3=most aggressive at removing speech)
+    
+    Returns:
+        Filtered samples with speech segments zeroed out
+    """
+    try:
+        import webrtcvad
+        import numpy as np
+    except ImportError:
+        # VAD not available, return unchanged
+        return samples
+    
+    if sample_rate not in (8000, 16000, 32000, 48000):
+        # Resample to 16kHz if needed
+        target_rate = 16000
+        samples = _resample(samples, sample_rate, target_rate)
+        sample_rate = target_rate
+    
+    vad = webrtcvad.Vad(aggressiveness)
+    frame_duration_ms = 20  # WebRTC VAD works with 20ms frames
+    frame_size = int(sample_rate * frame_duration_ms / 1000)
+    
+    # Convert float samples to 16-bit PCM
+    pcm_bytes = np.int16(np.array(samples) * 32768).tobytes()
+    
+    filtered = bytearray()
+    for start in range(0, len(pcm_bytes), frame_size * 2):  # *2 for 16-bit
+        frame = pcm_bytes[start : start + frame_size * 2]
+        if len(frame) < frame_size * 2:
+            filtered.extend(frame)
+            continue
+        
+        is_speech = vad.is_speech(frame, sample_rate)
+        if not is_speech:
+            # Keep non-speech frames
+            filtered.extend(frame)
+        else:
+            # Zero out speech frames
+            filtered.extend(b'\x00' * len(frame))
+    
+    # Convert back to float
+    result = np.frombuffer(filtered, dtype=np.int16).astype(np.float32) / 32768.0
+    return result.tolist()
+
+
+def _resample(samples: list[float], orig_rate: int, target_rate: int) -> list[float]:
+    """Simple linear interpolation resampling."""
+    import numpy as np
+    
+    if orig_rate == target_rate:
+        return samples
+    
+    ratio = len(samples) * target_rate / orig_rate
+    indices = np.linspace(0, len(samples) - 1, int(ratio))
+    resampled = np.interp(indices, np.arange(len(samples)), samples)
+    return resampled.tolist()
+
+
 def _rms(samples: list[float]) -> float:
     if not samples:
         return 0.0
@@ -70,6 +134,14 @@ def detect_heuristic_events(wav_path: Path, config: AudioConfig) -> list[Event]:
     samples, sample_rate = _read_wav_mono(wav_path)
     if not samples:
         return []
+    
+    # Apply VAD pre-filter if enabled
+    if config.use_vad:
+        try:
+            samples = _apply_vad_filter(samples, sample_rate, config.vad_aggressiveness)
+        except Exception:
+            # VAD failed, continue with unfiltered audio
+            pass
 
     frame_size = max(1, int(config.frame_seconds * sample_rate))
     hop_size = max(1, int(config.hop_seconds * sample_rate))
@@ -147,6 +219,14 @@ def detect_yamnet_events(wav_path: Path, config: AudioConfig) -> list[Event]:
     samples, sample_rate = _read_wav_mono(wav_path)
     if not samples:
         return []
+    
+    # Apply VAD pre-filter if enabled
+    if config.use_vad:
+        try:
+            samples = _apply_vad_filter(samples, sample_rate, config.vad_aggressiveness)
+        except Exception:
+            # VAD failed, continue with unfiltered audio
+            pass
 
     audio_data = mp.tasks.components.containers.AudioData.create_from_array(
         np.asarray(samples, dtype=np.float32),
@@ -170,8 +250,11 @@ def detect_yamnet_events(wav_path: Path, config: AudioConfig) -> list[Event]:
     candidates: list[Event] = []
     with mp.tasks.audio.AudioClassifier.create_from_options(options) as classifier:
         results = classifier.classify(audio_data)
-        for result in results:
-            timestamp = max(0.0, result.timestamp_ms / 1000.0)
+        for chunk_idx, result in enumerate(results):
+            # Manually compute timestamp using chunk index and hop size
+            # This is more reliable than result.timestamp_ms for AUDIO_CLIPS mode
+            timestamp = max(0.0, chunk_idx * config.hop_seconds)
+            
             categories = result.classifications[0].categories if result.classifications else []
             chosen = None
             for category in categories:
@@ -182,10 +265,12 @@ def detect_yamnet_events(wav_path: Path, config: AudioConfig) -> list[Event]:
                     break
             if chosen is None:
                 continue
+            
+            # Use config.frame_seconds instead of hardcoded 0.975
             candidates.append(
                 Event.candidate(
                     timestamp,
-                    timestamp + 0.975,
+                    timestamp + config.frame_seconds,
                     chosen.category_name,
                     float(chosen.score),
                 )

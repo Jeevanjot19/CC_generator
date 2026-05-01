@@ -11,12 +11,15 @@ class AudioConfig:
     model: str = "heuristic"
     yamnet_model_path: str = "models/yamnet.tflite"
     sample_rate: int = 16_000
-    frame_seconds: float = 0.25
-    hop_seconds: float = 0.125
+    frame_seconds: float = 0.25  # YAMNet inference window size
+    hop_seconds: float = 0.125   # Hop size for sliding window (must be <= frame_seconds)
     min_event_duration: float = 0.18
     gap_tolerance: float = 0.35
     energy_threshold: float = 0.035
     noise_ratio: float = 3.2
+    # VAD (Voice Activity Detection) settings
+    use_vad: bool = True  # Enable voice filtering via WebRTC VAD
+    vad_aggressiveness: int = 2  # 0=least aggressive, 3=most aggressive (remove speech)
 
 
 @dataclass(frozen=True)
@@ -29,7 +32,8 @@ class VisualConfig:
     fps: int = 4
     width: int = 64
     height: int = 36
-    reaction_threshold: float = 0.35
+    reaction_threshold: float = 0.35  # Minimum normalized reaction score for detection
+    opencv_motion_type_threshold: float = 0.4  # Threshold for classifying as "scene_motion"
 
 
 @dataclass(frozen=True)
@@ -68,10 +72,35 @@ class PipelineConfig:
     fusion: FusionConfig = field(default_factory=FusionConfig)
     label_taxonomy: dict[str, str] = field(
         default_factory=lambda: {
+            # Heuristic backend (generic names)
             "sharp_impact": "[Impact sound]",
             "loud_sound": "[Loud sound]",
             "sustained_sound": "[Sustained sound]",
             "sound_event": "[Sound effect]",
+            # YAMNet backend (rich class names from ML model)
+            "Honking": "[honking]",
+            "Honk, horn": "[honking]",
+            "Honk": "[honking]",
+            "Gunshot, gunfire": "[gunshot]",
+            "Gunshot": "[gunshot]",
+            "Gunfire": "[gunshot]",
+            "Explosion": "[explosion]",
+            "Burst, pop": "[explosion]",
+            "Applause": "[applause]",
+            "Clapping": "[applause]",
+            "Laughter": "[laughter]",
+            "Glass breaking": "[glass breaking]",
+            "Breaking": "[glass breaking]",
+            "Crash": "[crash]",
+            "Crash cymbal": "[crash]",
+            "Alarm": "[alarm]",
+            "Alarm clock": "[alarm]",
+            "Door, wood knock": "[knock]",
+            "Knock": "[knock]",
+            "Bell": "[bell]",
+            "Ringing": "[bell]",
+            "Siren": "[siren]",
+            "Whistle": "[whistle]",
         }
     )
 
