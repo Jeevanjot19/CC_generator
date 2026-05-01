@@ -41,6 +41,7 @@ def run_cmd(cmd, description="", show_output=False):
 def check_dependencies():
     """Verify all required dependencies are installed."""
     import os
+    import shutil
     
     print("\n" + "=" * 70)
     print("🔧 CHECKING DEPENDENCIES")
@@ -51,6 +52,7 @@ def check_dependencies():
         Path(os.path.expandvars(r"%LOCALAPPDATA%\Programs\FFmpeg\bin")),
         Path(r"C:\Program Files\FFmpeg\bin"),
         Path(r"C:\FFmpeg\bin"),
+        Path(os.path.expandvars(r"%ProgramFiles%\FFmpeg\bin")),
     ]
     
     for ffmpeg_path in ffmpeg_paths:
@@ -69,17 +71,24 @@ def check_dependencies():
     
     for cmd, name in required.items():
         try:
+            # First try using shutil.which to find the command
+            if shutil.which(cmd):
+                print(f"✅ {name} found")
+                continue
+            
+            # Fallback to subprocess check
             result = subprocess.run(
                 [cmd, "--version"],
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
+                shell=True
             )
             if result.returncode == 0:
                 print(f"✅ {name} found")
             else:
                 missing.append(name)
-        except FileNotFoundError:
+        except (FileNotFoundError, subprocess.TimeoutExpired):
             missing.append(name)
     
     if missing:
