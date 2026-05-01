@@ -6,6 +6,7 @@ Handles video format conversion, validation, and preparation for pipeline.
 
 import subprocess
 import json
+import os
 from pathlib import Path
 from typing import Optional, NamedTuple
 
@@ -21,8 +22,24 @@ class VideoInfo(NamedTuple):
     valid: bool = True
 
 
+def setup_ffmpeg_path():
+    """Add FFmpeg to PATH if it's in a standard location."""
+    ffmpeg_paths = [
+        Path(os.path.expandvars(r"%LOCALAPPDATA%\Programs\FFmpeg\bin")),
+        Path(r"C:\Program Files\FFmpeg\bin"),
+        Path(r"C:\FFmpeg\bin"),
+    ]
+    
+    for ffmpeg_path in ffmpeg_paths:
+        if ffmpeg_path.exists():
+            os.environ['PATH'] = str(ffmpeg_path) + os.pathsep + os.environ['PATH']
+            return True
+    return False
+
+
 def check_ffmpeg() -> bool:
     """Check if FFmpeg is installed."""
+    setup_ffmpeg_path()
     try:
         result = subprocess.run(
             ["ffmpeg", "-version"],
@@ -37,6 +54,7 @@ def check_ffmpeg() -> bool:
 
 def get_video_info(video_path: str | Path) -> Optional[VideoInfo]:
     """Extract video metadata using ffprobe."""
+    setup_ffmpeg_path()
     video_path = Path(video_path)
     
     if not video_path.exists():
@@ -84,6 +102,7 @@ def get_video_info(video_path: str | Path) -> Optional[VideoInfo]:
 
 def extract_audio(video_path: str | Path, output_path: str | Path) -> bool:
     """Extract audio from video file."""
+    setup_ffmpeg_path()
     video_path = Path(video_path)
     output_path = Path(output_path)
     
@@ -122,6 +141,7 @@ def convert_video(
     quality: str = "medium"
 ) -> bool:
     """Convert video to standard format."""
+    setup_ffmpeg_path()
     video_path = Path(video_path)
     output_path = Path(output_path)
     

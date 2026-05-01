@@ -12,6 +12,7 @@ Complete pipeline for testing with actual videos:
 import json
 import subprocess
 import sys
+import os
 from pathlib import Path
 from datetime import datetime
 
@@ -39,9 +40,24 @@ def run_cmd(cmd, description="", show_output=False):
 
 def check_dependencies():
     """Verify all required dependencies are installed."""
+    import os
+    
     print("\n" + "=" * 70)
     print("🔧 CHECKING DEPENDENCIES")
     print("=" * 70)
+    
+    # Try to add FFmpeg to PATH if it's in a common location
+    ffmpeg_paths = [
+        Path(os.path.expandvars(r"%LOCALAPPDATA%\Programs\FFmpeg\bin")),
+        Path(r"C:\Program Files\FFmpeg\bin"),
+        Path(r"C:\FFmpeg\bin"),
+    ]
+    
+    for ffmpeg_path in ffmpeg_paths:
+        if ffmpeg_path.exists():
+            os.environ['PATH'] = str(ffmpeg_path) + os.pathsep + os.environ['PATH']
+            print(f"📍 Added FFmpeg to PATH: {ffmpeg_path}")
+            break
     
     required = {
         "ffmpeg": "FFmpeg",
