@@ -1,0 +1,16 @@
+{
+  "predictions": 2,
+  "ground_truth": 2,
+  "true_positive": 2,
+  "false_positive": 0,
+  "false_negative": 0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "overcaption_rate": 0.0,
+  "undercaption_rate": 0.0,
+  "compliance": {
+    "avoid_overcaption": "PASS (0.0% false positives <= 10% target)",
+    "detect_events": "PASS (100.0% detection rate >= 80% target)"
+  }
+}

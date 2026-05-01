@@ -1,0 +1,36 @@
+{
+  "audio": {
+    "model": "heuristic",
+    "sample_rate": 16000,
+    "frame_seconds": 0.25,
+    "hop_seconds": 0.125,
+    "min_event_duration": 0.18,
+    "gap_tolerance": 0.35,
+    "energy_threshold": 0.035,
+    "noise_ratio": 3.2
+  },
+  "visual": {
+    "backend": "mediapipe",
+    "pose_model_path": "models/pose_landmarker_lite.task",
+    "face_model_path": "models/face_landmarker.task",
+    "context_before": 1.0,
+    "context_after": 2.0,
+    "fps": 4,
+    "width": 192,
+    "height": 108,
+    "reaction_threshold": 0.35
+  },
+  "fusion": {
+    "alpha": 0.6,
+    "beta": 0.4,
+    "decision_threshold": 0.55,
+    "audio_override_threshold": 0.92,
+    "reaction_override_threshold": 0.88
+  },
+  "label_taxonomy": {
+    "sharp_impact": "[Impact sound]",
+    "loud_sound": "[Loud sound]",
+    "sustained_sound": "[Sustained sound]",
+    "sound_event": "[Sound effect]"
+  }
+}

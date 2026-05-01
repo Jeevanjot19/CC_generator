@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Intelligent CC Suggestion Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172026;
+      --muted: #5e6b73;
+      --line: #d8e0e5;
+      --paper: #ffffff;
+      --bg: #f5f7f8;
+      --accent: #1b6b68;
+      --accepted: #176b3a;
+      --accepted-bg: #e8f5ed;
+      --rejected: #8a3d18;
+      --rejected-bg: #fff1e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin: 0 0 8px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      vertical-align: top;
+    }
+    th {
+      background: #edf3f3;
+      color: #27363d;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .accepted {
+      color: var(--accepted);
+      background: var(--accepted-bg);
+    }
+    .rejected {
+      color: var(--rejected);
+      background: var(--rejected-bg);
+    }
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 28px;
+    }
+    code {
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 760px) {
+      header { display: block; }
+      .stats { grid-template-columns: 1fr; }
+      .panel { overflow-x: auto; }
+      table { min-width: 760px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Intelligent CC Suggestion Report</h1>
+        <p>Input: <code>samples\demo_video.mp4</code></p>
+      </div>
+      <p>Output: <code>out\video_demo.srt</code></p>
+    </header>
+    <section class="stats" aria-label="Summary">
+      <div class="stat"><strong>2</strong><span>Audio candidates</span></div>
+      <div class="stat"><strong>2</strong><span>Accepted captions</span></div>
+      <div class="stat"><strong>0</strong><span>Rejected events</span></div>
+    </section>
+    <section class="panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Label</th>
+            <th>Audio</th>
+            <th>Reaction</th>
+            <th>Fusion</th>
+            <th>Decision</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>00:00:00,875</td><td>00:00:01,500</td><td>[Loud sound]</td><td>95%</td><td>13%</td><td>62%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+<tr><td>00:00:02,125</td><td>00:00:03,375</td><td>[Loud sound]</td><td>95%</td><td>10%</td><td>61%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

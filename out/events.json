@@ -1,0 +1,34 @@
+[
+  {
+    "event_id": "7b8fcda6-95a0-4303-a59d-7c7693c1fed0",
+    "t_start": 0.875,
+    "t_end": 1.5,
+    "audio_class": "loud_sound",
+    "audio_confidence": 0.95,
+    "reaction_score": 0.0,
+    "reaction_type": null,
+    "fusion_score": 0.57,
+    "cc_decision": true,
+    "cc_label": "[Loud sound]",
+    "notes": [
+      "visual_skipped:no_video_input"
+    ],
+    "duration": 0.625
+  },
+  {
+    "event_id": "83b77482-fefc-4aed-ad1f-2f588c2d3fee",
+    "t_start": 2.125,
+    "t_end": 3.375,
+    "audio_class": "loud_sound",
+    "audio_confidence": 0.95,
+    "reaction_score": 0.0,
+    "reaction_type": null,
+    "fusion_score": 0.57,
+    "cc_decision": true,
+    "cc_label": "[Loud sound]",
+    "notes": [
+      "visual_skipped:no_video_input"
+    ],
+    "duration": 1.25
+  }
+]

@@ -1,0 +1,6 @@
+
+        {
+          "fusion": {"decision_threshold": 0.75},
+          "label_taxonomy": {"loud_sound": "[Custom loud event]"}
+        }
+        

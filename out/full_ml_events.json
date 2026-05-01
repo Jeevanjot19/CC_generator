@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "8de8873b-04d4-43e5-9630-42324bd705ad",
+    "t_start": 0.975,
+    "t_end": 3.9,
+    "audio_class": "Busy signal",
+    "audio_confidence": 0.918,
+    "reaction_score": 0.0,
+    "reaction_type": null,
+    "fusion_score": 0.551,
+    "cc_decision": true,
+    "cc_label": "[Busy signal]",
+    "notes": [
+      "visual_skipped:mediapipe_no_landmarks"
+    ],
+    "duration": 2.925
+  }
+]

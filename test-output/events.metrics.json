@@ -1,0 +1,8 @@
+{
+  "total_time": 0.049603939056396484,
+  "audio_detection_time": 0.04603767395019531,
+  "visual_detection_time": 4.5299530029296875e-06,
+  "fusion_time": 7.867813110351562e-06,
+  "num_audio_candidates": 2,
+  "num_accepted": 2
+}

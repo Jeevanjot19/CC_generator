@@ -1,0 +1,18 @@
+[
+  {
+    "event_id": "006d3dac-0f29-45e4-9b10-7280d79c0ab5",
+    "t_start": 0.975,
+    "t_end": 3.9,
+    "audio_class": "Busy signal",
+    "audio_confidence": 0.918,
+    "reaction_score": 0.0,
+    "reaction_type": null,
+    "fusion_score": 0.551,
+    "cc_decision": true,
+    "cc_label": "[Sound effect]",
+    "notes": [
+      "visual_skipped:no_video_input"
+    ],
+    "duration": 2.925
+  }
+]
