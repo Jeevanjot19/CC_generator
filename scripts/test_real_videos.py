@@ -25,10 +25,15 @@ def run_cmd(cmd, description="", show_output=False):
         result = subprocess.run(
             cmd,
             shell=True,
-            capture_output=not show_output,
+            capture_output=True,
             text=True,
             timeout=600
         )
+        if result.returncode != 0:
+            if result.stdout:
+                print(f"Output: {result.stdout[:300]}")
+            if result.stderr:
+                print(f"Error: {result.stderr[:300]}")
         return result.returncode == 0
     except subprocess.TimeoutExpired:
         print(f"❌ Timeout")
