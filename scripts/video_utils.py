@@ -53,7 +53,7 @@ def check_ffmpeg() -> bool:
 
 
 def get_video_info(video_path: str | Path) -> Optional[VideoInfo]:
-    """Extract video metadata using ffprobe."""
+    """Extract video metadata using ffmpeg/ffprobe."""
     setup_ffmpeg_path()
     video_path = Path(video_path)
     
@@ -62,37 +62,65 @@ def get_video_info(video_path: str | Path) -> Optional[VideoInfo]:
         return None
     
     try:
-        cmd = [
-            "ffprobe",
-            "-v", "error",
-            "-select_streams", "v:0",
-            "-show_entries", "stream=width,height,duration,r_frame_rate,codec_name",
-            "-of", "json",
-            str(video_path)
-        ]
+        # Get detailed info using ffmpeg
+        result = subprocess.run(
+            ["ffmpeg", "-i", str(video_path)],
+            capture_output=True,
+            text=True,
+            timeout=10
+        )
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-        data = json.loads(result.stdout)
+        output_text = result.stderr
         
-        if not data.get("streams"):
-            return None
+        # Extract duration: Duration: 00:00:30.00
+        duration = 0.0
+        for line in output_text.split("\n"):
+            if "Duration:" in line:
+                time_part = line.split("Duration:")[1].split(",")[0].strip()
+                parts = time_part.split(":")
+                if len(parts) == 3:
+                    h, m, s = parts
+                    duration = int(h) * 3600 + int(m) * 60 + float(s)
+                break
         
-        stream = data["streams"][0]
-        fps_str = stream.get("r_frame_rate", "30/1")
-        fps_parts = fps_str.split("/")
-        fps = float(fps_parts[0]) / float(fps_parts[1]) if len(fps_parts) == 2 else 30.0
+        # Get video stream info
+        width, height, fps, codec = 0, 0, 30.0, "unknown"
         
-        duration_str = data.get("format", {}).get("duration", "0")
-        duration = float(duration_str)
+        if "Video:" in output_text:
+            for line in output_text.split("\n"):
+                if "Video:" in line:
+                    import re
+                    # Parse resolution: 640x480 (not 0x1 which is hex)
+                    # Look for numbers that are at least 2 digits
+                    res_match = re.search(r"(\d{2,})x(\d{2,})", line)
+                    if res_match:
+                        width = int(res_match.group(1))
+                        height = int(res_match.group(2))
+                    
+                    # Parse codec: mpeg4, h264, etc
+                    codec_match = re.search(r"Video:\s+(\w+)", line)
+                    if codec_match:
+                        codec = codec_match.group(1)
+                    
+                    # Parse FPS: "24 fps", "30000/1001 fps"
+                    fps_match = re.search(r"(\d+\.?\d*)\s*fps", line)
+                    if fps_match:
+                        fps = float(fps_match.group(1))
+                    else:
+                        # Try fractional format
+                        fps_frac = re.search(r"(\d+)/(\d+)\s*fps", line)
+                        if fps_frac:
+                            fps = float(fps_frac.group(1)) / float(fps_frac.group(2))
+                    break
         
         file_size_mb = video_path.stat().st_size / (1024 * 1024)
         
         return VideoInfo(
-            width=stream.get("width", 0),
-            height=stream.get("height", 0),
+            width=width,
+            height=height,
             duration=duration,
             fps=fps,
-            codec=stream.get("codec_name", "unknown"),
+            codec=codec,
             file_size_mb=file_size_mb
         )
     except Exception as e:
