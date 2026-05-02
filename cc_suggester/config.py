@@ -14,6 +14,7 @@ class AudioConfig:
     frame_seconds: float = 0.25  # YAMNet inference window size
     hop_seconds: float = 0.125   # Hop size for sliding window (must be <= frame_seconds)
     min_event_duration: float = 0.18
+    max_caption_duration: float = 3.0  # Split captions longer than this (professional subtitle standard)
     gap_tolerance: float = 0.35
     energy_threshold: float = 0.035
     noise_ratio: float = 3.2
@@ -101,6 +102,21 @@ class PipelineConfig:
             "Ringing": "[bell]",
             "Siren": "[siren]",
             "Whistle": "[whistle]",
+            # YAMNet classes detected in real videos
+            "Arrow": "[arrow]",
+            "Animal": "[animal]",
+            "Horse": "[horse]",
+            "Door": "[door]",
+            "Engine": "[engine]",
+            "Fireworks": "[fireworks]",
+            "Pigeon, dove": "[bird]",
+            "Rail transport": "[train]",
+            "Scary music": "[scary music]",
+            "Sliding door": "[sliding door]",
+            "Train": "[train]",
+            "Typing": "[typing]",
+            "Vehicle": "[vehicle]",
+            "Ambient music": "[ambient music]",
         }
     )
 

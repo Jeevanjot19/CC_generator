@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import copy
 import json
 import logging
+import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -66,6 +68,31 @@ def apply_decisions(events: list[Event], config: PipelineConfig) -> list[Event]:
             or event.reaction_score >= fusion.reaction_override_threshold
         )
     return events
+
+
+def _split_long_captions(events: list[Event], max_duration: float) -> list[Event]:
+    """Split captions longer than max_duration into multiple shorter captions.
+    
+    Professional subtitle standards recommend captions no longer than 2-3 seconds.
+    This function splits longer captions to meet accessibility and readability standards.
+    """
+    result = []
+    for event in events:
+        duration = event.t_end - event.t_start
+        if duration <= max_duration:
+            result.append(event)
+        else:
+            # Split into multiple parts
+            num_parts = math.ceil(duration / max_duration)
+            part_duration = duration / num_parts
+            for i in range(num_parts):
+                t_start = event.t_start + i * part_duration
+                t_end = min(event.t_end, t_start + part_duration)
+                part = copy.deepcopy(event)
+                part.t_start = t_start
+                part.t_end = t_end
+                result.append(part)
+    return result
 
 
 def run_pipeline(
@@ -142,19 +169,24 @@ def run_pipeline(
     apply_decisions(events, config)
     fusion_time = time.time() - fusion_start
     
-    accepted = sum(1 for event in events if event.cc_decision)
-    logger.info(f"Fusion complete: {len(events)} candidates → {accepted} accepted")
+    accepted = [e for e in events if e.cc_decision]
+    logger.info(f"Fusion complete: {len(events)} candidates → {len(accepted)} accepted")
+    
+    # Split long captions to meet subtitle duration standard (≤3s)
+    if accepted:
+        accepted = _split_long_captions(accepted, config.audio.max_caption_duration)
+        logger.info(f"Caption splitting: max {config.audio.max_caption_duration}s applied")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if output_format == "srt":
-        write_srt(events, output_path)
+        write_srt(accepted, output_path)
         logger.info(f"Wrote SRT output to {output_path}")
     elif output_format == "sls":
-        write_sls(events, output_path)
+        write_sls(accepted, output_path)
         logger.info(f"Wrote SLS output to {output_path}")
     elif output_format == "both":
-        write_srt(events, output_path.with_suffix(".srt"))
-        write_sls(events, output_path.with_suffix(".sls"))
+        write_srt(accepted, output_path.with_suffix(".srt"))
+        write_sls(accepted, output_path.with_suffix(".sls"))
         logger.info(f"Wrote SRT and SLS outputs")
     else:
         logger.error(f"Invalid output format: {output_format}")
@@ -168,7 +200,7 @@ def run_pipeline(
         visual_detection_time=visual_time,
         fusion_time=fusion_time,
         num_audio_candidates=len(events),
-        num_accepted=accepted,
+        num_accepted=len(accepted),
     )
     
     # Convert to ReportMetrics for HTML display

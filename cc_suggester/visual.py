@@ -80,9 +80,21 @@ def score_opencv_motion(video_path: Path, events: list[Event], config: VisualCon
 
         diffs = _frame_diffs(frames)
         peak = max(diffs, default=0.0)
-        score = min(1.0, peak / config.reaction_threshold)
+        avg_diff = sum(diffs) / len(diffs) if diffs else 0.0
+        # Sigmoid normalization to avoid saturation at 1.0 and detect scene cuts
+        import math
+        raw_score = peak / max(config.reaction_threshold, 0.001)
+        # Use sigmoid for smooth scaling instead of hard ceiling
+        score = 2.0 / (1.0 + math.exp(-raw_score)) - 1.0
         event.reaction_score = round(score, 3)
-        event.reaction_type = "scene_motion" if score >= config.opencv_motion_type_threshold else None
+        # Detect hard scene cuts (peak >> avg indicates cut, not motion)
+        is_scene_cut = peak > avg_diff * 3.0 if avg_diff > 0.01 else False
+        if is_scene_cut:
+            event.reaction_type = "scene_cut"  # Mark as cut, not reaction
+        elif score >= config.opencv_motion_type_threshold:
+            event.reaction_type = "scene_motion"
+        else:
+            event.reaction_type = None
     return events
 
 

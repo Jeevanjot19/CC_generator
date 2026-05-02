@@ -251,9 +251,13 @@ def detect_yamnet_events(wav_path: Path, config: AudioConfig) -> list[Event]:
     with mp.tasks.audio.AudioClassifier.create_from_options(options) as classifier:
         results = classifier.classify(audio_data)
         for chunk_idx, result in enumerate(results):
-            # Manually compute timestamp using chunk index and hop size
-            # This is more reliable than result.timestamp_ms for AUDIO_CLIPS mode
-            timestamp = max(0.0, chunk_idx * config.hop_seconds)
+            # Use result.timestamp_ms from MediaPipe for accurate timing
+            # This is the timestamp in milliseconds for each detected chunk
+            if hasattr(result, 'timestamp_ms') and result.timestamp_ms is not None:
+                timestamp = max(0.0, result.timestamp_ms / 1000.0)
+            else:
+                # Fallback to hop-size calculation if timestamp unavailable
+                timestamp = max(0.0, chunk_idx * config.hop_seconds)
             
             categories = result.classifications[0].categories if result.classifications else []
             chosen = None

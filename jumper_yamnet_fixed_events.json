@@ -1,0 +1,16 @@
+[
+  {
+    "event_id": "1a317c69-c18b-4b69-87ec-9624fe3ed812",
+    "t_start": 5.85,
+    "t_end": 6.1,
+    "audio_class": "Typing",
+    "audio_confidence": 0.668,
+    "reaction_score": 0.587,
+    "reaction_type": "scene_cut",
+    "fusion_score": 0.636,
+    "cc_decision": true,
+    "cc_label": "[typing]",
+    "notes": [],
+    "duration": 0.25
+  }
+]

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Intelligent CC Suggestion Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172026;
+      --muted: #5e6b73;
+      --line: #d8e0e5;
+      --paper: #ffffff;
+      --bg: #f5f7f8;
+      --accent: #1b6b68;
+      --accepted: #176b3a;
+      --accepted-bg: #e8f5ed;
+      --rejected: #8a3d18;
+      --rejected-bg: #fff1e8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.2;
+      margin: 0 0 8px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .metrics-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .metrics-panel h2 {
+      margin: 0 0 16px 0;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+    }
+    .metric-item {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+    }
+    .metric-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .metric-value {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+      vertical-align: top;
+    }
+    th {
+      background: #edf3f3;
+      color: #27363d;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .accepted {
+      color: var(--accepted);
+      background: var(--accepted-bg);
+    }
+    .rejected {
+      color: var(--rejected);
+      background: var(--rejected-bg);
+    }
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 28px;
+    }
+    code {
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 760px) {
+      header { display: block; }
+      .stats { grid-template-columns: 1fr; }
+      .panel { overflow-x: auto; }
+      table { min-width: 760px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Intelligent CC Suggestion Report</h1>
+        <p>Input: <code>videos\JUMPER -  Suspense Thriller Short Film.mp4</code></p>
+      </div>
+      <p>Output: <code>jumper_heuristic.srt</code></p>
+    </header>
+    <section class="stats" aria-label="Summary">
+      <div class="stat"><strong>27</strong><span>Audio candidates</span></div>
+      <div class="stat"><strong>4</strong><span>Accepted captions</span></div>
+      <div class="stat"><strong>23</strong><span>Rejected events</span></div>
+    </section>
+    <section class="metrics-panel">
+      <h2>Performance Metrics</h2>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <span class="metric-label">Total Time</span>
+          <span class="metric-value">5.569s</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Audio Detection</span>
+          <span class="metric-value">2.286s</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Visual Scoring</span>
+          <span class="metric-value">2.831s</span>
+        </div>
+        <div class="metric-item">
+          <span class="metric-label">Fusion Logic</span>
+          <span class="metric-value">0.000s</span>
+        </div>
+        
+        
+        
+        
+      </div>
+    </section>
+    <section class="panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Start</th>
+            <th>End</th>
+            <th>Label</th>
+            <th>Audio</th>
+            <th>Reaction</th>
+            <th>Fusion</th>
+            <th>Decision</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>00:00:23,250</td><td>00:00:23,750</td><td>[Loud sound]</td><td>62%</td><td>100%</td><td>78%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+<tr><td>00:01:10,000</td><td>00:01:11,500</td><td>[Sustained sound]</td><td>80%</td><td>93%</td><td>85%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+<tr><td>00:01:38,625</td><td>00:01:39,000</td><td>[Impact sound]</td><td>46%</td><td>22%</td><td>36%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:01:46,000</td><td>00:01:47,000</td><td>[Loud sound]</td><td>59%</td><td>63%</td><td>60%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+<tr><td>00:02:01,875</td><td>00:02:03,625</td><td>[Sustained sound]</td><td>68%</td><td>23%</td><td>50%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:10,250</td><td>00:02:10,625</td><td>[Impact sound]</td><td>51%</td><td>19%</td><td>38%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:11,000</td><td>00:02:11,250</td><td>[Impact sound]</td><td>45%</td><td>6%</td><td>30%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:14,875</td><td>00:02:15,750</td><td>[Loud sound]</td><td>50%</td><td>16%</td><td>36%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:16,125</td><td>00:02:16,375</td><td>[Impact sound]</td><td>47%</td><td>16%</td><td>35%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:18,250</td><td>00:02:18,750</td><td>[Loud sound]</td><td>50%</td><td>17%</td><td>37%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:20,500</td><td>00:02:21,250</td><td>[Loud sound]</td><td>48%</td><td>15%</td><td>35%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:22,500</td><td>00:02:23,000</td><td>[Loud sound]</td><td>58%</td><td>15%</td><td>41%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:23,375</td><td>00:02:23,625</td><td>[Impact sound]</td><td>49%</td><td>15%</td><td>36%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:24,750</td><td>00:02:25,500</td><td>[Loud sound]</td><td>47%</td><td>17%</td><td>35%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:28,875</td><td>00:02:29,375</td><td>[Loud sound]</td><td>52%</td><td>17%</td><td>38%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:31,125</td><td>00:02:31,875</td><td>[Loud sound]</td><td>49%</td><td>15%</td><td>35%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:33,125</td><td>00:02:34,250</td><td>[Loud sound]</td><td>56%</td><td>15%</td><td>39%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:35,375</td><td>00:02:36,125</td><td>[Loud sound]</td><td>48%</td><td>15%</td><td>35%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:37,375</td><td>00:02:37,875</td><td>[Loud sound]</td><td>52%</td><td>16%</td><td>38%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:39,625</td><td>00:02:40,375</td><td>[Loud sound]</td><td>50%</td><td>16%</td><td>37%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:41,500</td><td>00:02:42,875</td><td>[Sustained sound]</td><td>65%</td><td>16%</td><td>45%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:43,625</td><td>00:02:44,625</td><td>[Loud sound]</td><td>52%</td><td>14%</td><td>37%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:45,750</td><td>00:02:47,125</td><td>[Sustained sound]</td><td>67%</td><td>20%</td><td>48%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:47,875</td><td>00:02:49,000</td><td>[Loud sound]</td><td>59%</td><td>20%</td><td>43%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:50,125</td><td>00:02:51,375</td><td>[Loud sound]</td><td>60%</td><td>1%</td><td>36%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:52,000</td><td>00:02:53,500</td><td>[Sustained sound]</td><td>63%</td><td>1%</td><td>38%</td><td><span class="badge rejected">Rejected</span></td><td></td></tr>
+<tr><td>00:02:54,250</td><td>00:03:00,875</td><td>[Sustained sound]</td><td>95%</td><td>31%</td><td>69%</td><td><span class="badge accepted">Accepted</span></td><td></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

@@ -141,7 +141,7 @@ def test_yamnet_backend_runs_when_mediapipe_is_available() -> None:
     wav_path = Path("test-output/yamnet-run-demo.wav")
     create_demo_wav(wav_path)
 
-    events = run_pipeline(wav_path, Path("test-output/yamnet-run.srt"), config=config)
+    events, metrics = run_pipeline(wav_path, Path("test-output/yamnet-run.srt"), config=config)
 
     assert isinstance(events, list)
 

@@ -1,6 +1,6 @@
 [
   {
-    "event_id": "47b6beef-25ff-4064-8a5c-38ec3ec01cb9",
+    "event_id": "1b3c4933-ce18-402f-9ab1-06e1921e3c0c",
     "t_start": 0.875,
     "t_end": 1.5,
     "audio_class": "loud_sound",
@@ -16,7 +16,7 @@
     "duration": 0.625
   },
   {
-    "event_id": "60d1665b-e3fa-4f2f-91cc-5261ba8577ab",
+    "event_id": "169e2f36-3387-430a-9f41-c86429efc225",
     "t_start": 2.125,
     "t_end": 3.375,
     "audio_class": "loud_sound",
