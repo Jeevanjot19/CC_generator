@@ -400,7 +400,8 @@ def main():
     print("=" * 70 + "\n")
 
     print(f"Input: {args.input.name}")
-    print(f"Audio config: heuristic={config.audio.use_heuristic}, yamnet={config.audio.use_yamnet}\n")
+    print(f"Audio model: {config.audio.model}")
+    print(f"YAMNet model path: {config.audio.yamnet_model_path}\n")
 
     # Run both backends
     print("Running heuristic detection...")
