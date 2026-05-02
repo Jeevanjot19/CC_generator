@@ -53,6 +53,7 @@ pytest-cache-files-*/
 videos/
 results/
 ground_truth/
+models/  # Large ML model files (.tflite, .task)
 
 # Keep these demo files
 !samples/

@@ -91,6 +91,10 @@ def score_opencv_motion(video_path: Path, events: list[Event], config: VisualCon
         is_scene_cut = peak > avg_diff * 3.0 if avg_diff > 0.01 else False
         if is_scene_cut:
             event.reaction_type = "scene_cut"  # Mark as cut, not reaction
+            # Heavily discount scene cuts so they don't trigger false positives
+            event.reaction_score = round(score * 0.2, 3)
+            event.notes = event.notes or []
+            event.notes.append("visual:scene_cut_detected")
         elif score >= config.opencv_motion_type_threshold:
             event.reaction_type = "scene_motion"
         else:

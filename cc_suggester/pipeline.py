@@ -169,13 +169,16 @@ def run_pipeline(
     apply_decisions(events, config)
     fusion_time = time.time() - fusion_start
     
-    accepted = [e for e in events if e.cc_decision]
-    logger.info(f"Fusion complete: {len(events)} candidates → {len(accepted)} accepted")
+    num_candidates = len(events)
+    logger.info(f"Fusion complete: {num_candidates} candidates → {sum(1 for e in events if e.cc_decision)} accepted")
     
     # Split long captions to meet subtitle duration standard (≤3s)
-    if accepted:
-        accepted = _split_long_captions(accepted, config.audio.max_caption_duration)
-        logger.info(f"Caption splitting: max {config.audio.max_caption_duration}s applied")
+    # Apply to entire events list so JSON and SRT are consistent
+    events = _split_long_captions(events, config.audio.max_caption_duration)
+    logger.info(f"Caption splitting: max {config.audio.max_caption_duration}s applied")
+    
+    # Now get accepted list from split events
+    accepted = [e for e in events if e.cc_decision]
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if output_format == "srt":

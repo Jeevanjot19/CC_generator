@@ -92,14 +92,15 @@ Load any generated `*_events.json` file to visualize results.
 
 ---
 
-## 📚 Documentation Map
+## 📚 Documentation
+
+Essential guides for setup and usage:
 
 | Document | Purpose |
 |----------|---------|
 | **[REAL_VIDEO_TESTING.md](REAL_VIDEO_TESTING.md)** | 📹 End-to-end real video workflow |
 | **[FFMPEG_SETUP.md](FFMPEG_SETUP.md)** | 🎬 FFmpeg installation guide |
-| [CHECKLIST.md](CHECKLIST.md) | ✓ Project status & requirements |
-| [NEXT_STEPS.md](NEXT_STEPS.md) | 🚀 Roadmap & timeline |
+| **[REAL_VIDEO_TEST_RESULTS.md](REAL_VIDEO_TEST_RESULTS.md)** | ✅ Proof of concept & validation results |
 
 ### Utility Scripts
 
